@@ -16,6 +16,7 @@ Fold-wise `filterByExpr` + TMM + logCPM and nested hyperparameter optimization a
 | `aging_genes/` | Top-K consensus, stability selection, GO enrichment, ComBat visualization matrix |
 | `intervention/` | Within-cohort Welch tests and covariate-adjusted comparisons |
 | `ortholog/` | Dog–human–mouse protein extraction and MAFFT alignment |
+| `learning_curve/` | Leak-free learning curves (test MAE / R² vs. training size) for all six clocks |
 
 ## Input files (place next to the training scripts)
 
@@ -45,6 +46,19 @@ python plot_total_group_loo.py
 ```
 
 Downstream scripts in the other folders read these result directories (or the HPO gene rankings) and should be run from their own folder.
+
+## Learning curves
+
+For each of 10 repeats, a stratified ~20% test set is held out from the 89 normal samples, and nested training subsets (n = 20, 30, 40, 50, 60 and the full pool) are drawn from the remainder. `filterByExpr` + TMM + logCPM and hyperparameter tuning are fit on each training subset only. Test MAE is fitted with `MAE ≈ a + b / n` to estimate the error floor. Input files are read from `../model_training/` by default.
+
+```bash
+cd learning_curve
+python run_lc_lasso.py        # also: run_lc_elasticnet.py, run_lc_svr.py,
+                              #       run_lc_rf.py, run_lc_xgboost.py, run_lc_moe.py
+python plot_all_learning_curves.py
+```
+
+Each `run_lc_<model>.py` writes `results_<model>/` (`run_records.csv`, `summary_by_size.csv`, `saturation_fit.csv`, report and figures); `--resume` skips finished cells. `plot_all_learning_curves.py` merges them into `results_all/`. `run_learning_curve.sh` (linear clocks) and `run_learning_curve_remaining.sh` (RF, XGBoost, MoE) are batch wrappers for a server.
 
 ## License
 
