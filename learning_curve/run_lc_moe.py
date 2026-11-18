@@ -16,8 +16,8 @@ def main():
     parser.set_defaults(
         models="moe",
         outdir=os.path.join(_HERE, "results_moe"),
-        moe_trials=10,
-        moe_hpo_epochs=40,
+        moe_trials=25,
+        moe_hpo_epochs=60,
         moe_refit_epochs=100,
     )
     run_from_args(parser.parse_args())

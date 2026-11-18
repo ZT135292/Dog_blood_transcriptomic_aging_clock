@@ -43,8 +43,8 @@ def main():
     parser.set_defaults(
         models="rf,xgboost,moe",
         outdir=os.path.join(_SCRIPT_DIR, "results_remaining"),
-        moe_trials=10,
-        moe_hpo_epochs=40,
+        moe_trials=25,
+        moe_hpo_epochs=60,
         moe_refit_epochs=100,
     )
     args = parser.parse_args()

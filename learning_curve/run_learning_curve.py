@@ -1214,8 +1214,8 @@ def build_parser() -> argparse.ArgumentParser:
         default=DEFAULT_AGING_GENES,
         help="aging_gene_list.csv (required only when moe is included)",
     )
-    p.add_argument("--moe-trials", type=int, default=10, help="MoE Optuna trials (paper used 25)")
-    p.add_argument("--moe-hpo-epochs", type=int, default=40, help="MoE epochs per Optuna trial (paper used 60)")
+    p.add_argument("--moe-trials", type=int, default=25, help="MoE Optuna trials")
+    p.add_argument("--moe-hpo-epochs", type=int, default=60, help="MoE epochs per Optuna trial")
     p.add_argument("--moe-refit-epochs", type=int, default=100, help="MoE max epochs for the selection/refit stage")
     p.add_argument(
         "--moe-skip-optuna",

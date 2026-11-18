@@ -43,7 +43,10 @@ Each script writes `aging_clock_results_*_pipeline_foldwise_TMM_logCPM/` with `5
 python plot_total_5fold.py
 python plot_total_Dataset_loo.py
 python plot_total_group_loo.py
+python analyze_model_stability_and_complexity.py
 ```
+
+`analyze_model_stability_and_complexity.py` resamples the pooled out-of-fold predictions 5,000 times (seed 66) and writes the 95% confidence intervals for MAE and R² in `model_stability_complexity_analysis/model_performance_stability_summary.csv` (Table S20). It only reads the prediction files already produced by the six clocks.
 
 Downstream scripts in the other folders read these result directories (or the HPO gene rankings) and should be run from their own folder.
 

@@ -296,8 +296,8 @@ def default_moe_config(args) -> dict:
         },
         "optuna": {
             "enabled": not skip,
-            "trials": int(getattr(args, "moe_trials", 10)),
-            "epochs": int(getattr(args, "moe_hpo_epochs", 40)),
+            "trials": int(getattr(args, "moe_trials", 25)),
+            "epochs": int(getattr(args, "moe_hpo_epochs", 60)),
         },
     }
 
