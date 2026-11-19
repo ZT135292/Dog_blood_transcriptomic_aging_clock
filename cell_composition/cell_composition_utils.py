@@ -170,15 +170,21 @@ def ols_table(y: pd.Series, X: pd.DataFrame, response_name: str = "y") -> pd.Dat
     tss = float(np.sum((y_vec - y_vec.mean()) ** 2))
     r2 = 1.0 - rss / tss if tss > 0 else np.nan
 
-    if n > p + 1:
-        sigma2 = rss / (n - p - 1)
-        try:
-            cov = sigma2 * np.linalg.inv(x_design.T @ x_design)
-            se = np.sqrt(np.maximum(np.diag(cov), 0.0))
-        except np.linalg.LinAlgError:
-            se = np.full(p + 1, np.nan)
+    # CLR 分量之和恒为 0，且个别哑变量会与批次完全重合，设计矩阵可能秩亏。
+    # 拟合值与可估系数不受影响；标准误用广义逆，自由度按秩计算。
+    # 落在零空间里的系数无法唯一估计，标准误记为缺失。
+    k = x_design.shape[1]
+    rank = int(np.linalg.matrix_rank(x_design, tol=1e-8))
+    if n > rank:
+        sigma2 = rss / (n - rank)
+        xtx = x_design.T @ x_design
+        xtx_inv = np.linalg.pinv(xtx, rcond=1e-10)
+        se = np.sqrt(np.maximum(sigma2 * np.diag(xtx_inv), 0.0))
+        alias = np.linalg.norm(np.eye(k) - xtx_inv @ xtx, axis=1)
+        se[alias > 1e-6] = np.nan
     else:
-        se = np.full(p + 1, np.nan)
+        se = np.full(k, np.nan)
+    df_resid = max(n - rank, 1)
 
     terms = ["Intercept"] + list(X.columns)
     rows = []
@@ -187,7 +193,7 @@ def ols_table(y: pd.Series, X: pd.DataFrame, response_name: str = "y") -> pd.Dat
         s = se[i]
         t_stat = b / s if s and not np.isnan(s) and s > 0 else np.nan
         p_val = (
-            2 * stats.t.sf(abs(t_stat), df=max(n - p - 1, 1))
+            2 * stats.t.sf(abs(t_stat), df=df_resid)
             if not np.isnan(t_stat)
             else np.nan
         )
