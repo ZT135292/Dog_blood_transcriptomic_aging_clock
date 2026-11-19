@@ -15,11 +15,10 @@ from scipy import stats
 mpl.use("Agg")
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-COVARIANT_DIR = SCRIPT_DIR.parent
-NO_GROUP = COVARIANT_DIR.parent
-CELL_TYPE_DIR = NO_GROUP / "cell_type"
-if str(CELL_TYPE_DIR) not in sys.path:
-    sys.path.insert(0, str(CELL_TYPE_DIR))
+REPO_ROOT = SCRIPT_DIR.parent
+CELL_COMPOSITION_DIR = REPO_ROOT / "cell_composition"
+if str(CELL_COMPOSITION_DIR) not in sys.path:
+    sys.path.insert(0, str(CELL_COMPOSITION_DIR))
 
 from cell_composition_utils import (  # noqa: E402
     CLR_COLS,
@@ -31,7 +30,6 @@ from cell_composition_utils import (  # noqa: E402
     load_predictions,
     merge_clock_and_composition,
     ols_table,
-    script_paths,
     subset_normal_validation,
 )
 
@@ -71,12 +69,11 @@ MPL_STYLE = {
 
 
 def parse_args() -> argparse.Namespace:
-    _, parent = script_paths()
     parser = argparse.ArgumentParser(
         description="Within-group Welch before/after post-hoc covariate adjustment."
     )
-    parser.add_argument("--parent-dir", type=Path, default=parent)
-    parser.add_argument("--cell-dir", type=Path, default=CELL_TYPE_DIR)
+    parser.add_argument("--parent-dir", type=Path, default=REPO_ROOT / "model_training")
+    parser.add_argument("--cell-dir", type=Path, default=CELL_COMPOSITION_DIR)
     parser.add_argument(
         "--output-dir",
         type=Path,

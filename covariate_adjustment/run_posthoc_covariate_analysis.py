@@ -15,12 +15,10 @@ from scipy import stats
 mpl.use("Agg")
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-NO_GROUP = SCRIPT_DIR.parent
-CELL_TYPE_DIR = NO_GROUP / "cell_type"
-if str(CELL_TYPE_DIR) not in sys.path:
-    sys.path.insert(0, str(CELL_TYPE_DIR))
-if str(SCRIPT_DIR) not in sys.path:
-    sys.path.insert(0, str(SCRIPT_DIR))
+REPO_ROOT = SCRIPT_DIR.parent
+CELL_COMPOSITION_DIR = REPO_ROOT / "cell_composition"
+if str(CELL_COMPOSITION_DIR) not in sys.path:
+    sys.path.insert(0, str(CELL_COMPOSITION_DIR))
 
 from cell_composition_utils import (  # noqa: E402
     CLR_COLS,
@@ -31,9 +29,7 @@ from cell_composition_utils import (  # noqa: E402
     load_predictions,
     merge_clock_and_composition,
     ols_table,
-    script_paths,
 )
-from manuscript_sections import write_manuscript_sections  # noqa: E402
 
 MODEL_ORDER = list(MODEL_RESULT_DIRS.keys())
 BATCH_COLORS = plt.cm.tab10(np.linspace(0, 1, 10))
@@ -49,10 +45,9 @@ MPL_STYLE = {
 
 
 def parse_args() -> argparse.Namespace:
-    _, parent = script_paths()
     parser = argparse.ArgumentParser(description="Post-hoc covariate + within-study centered analysis.")
-    parser.add_argument("--parent-dir", type=Path, default=parent)
-    parser.add_argument("--cell-dir", type=Path, default=CELL_TYPE_DIR)
+    parser.add_argument("--parent-dir", type=Path, default=REPO_ROOT / "model_training")
+    parser.add_argument("--cell-dir", type=Path, default=CELL_COMPOSITION_DIR)
     parser.add_argument("--output-dir", type=Path, default=SCRIPT_DIR / "results")
     parser.add_argument("--cv-scheme", default="group_loo", choices=["group_loo", "DataSet_loo"])
     return parser.parse_args()
@@ -776,9 +771,6 @@ def main() -> None:
             "Model R²: batch + one additional covariate (group-LOO validation)",
         )
 
-    manuscript_dir = out_dir / "manuscript"
-    write_manuscript_sections(table_dir, manuscript_dir, args.cv_scheme, len(clr_cols))
-
     lines = [
         "=== Covariate post-hoc & within-study centered analysis ===",
         f"CV scheme: {args.cv_scheme}",
@@ -812,7 +804,6 @@ def main() -> None:
     print(f"完成。表格: {table_dir}")
     print(f"      图片: {fig_dir}")
     print(f"      报告: {out_dir / 'report_covariate_analysis.txt'}")
-    print(f"      文稿: {manuscript_dir}")
 
 
 if __name__ == "__main__":

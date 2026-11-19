@@ -48,7 +48,7 @@ python analyze_model_stability_and_complexity.py
 
 `analyze_model_stability_and_complexity.py` resamples the pooled out-of-fold predictions 5,000 times (seed 66) and writes the 95% confidence intervals for MAE and R² in `model_stability_complexity_analysis/model_performance_stability_summary.csv` (Table S20). It only reads the prediction files already produced by the six clocks.
 
-Downstream scripts in the other folders read these result directories (or the HPO gene rankings) and should be run from their own folder.
+Downstream scripts in the other folders read these result directories (or the HPO gene rankings) and should be run from their own folder. `covariate_adjustment/run_posthoc_covariate_analysis.py` and `intervention/run_within_group_posthoc_comparison.py` import shared functions from `cell_composition/cell_composition_utils.py`. They look for clock predictions in `model_training/aging_clock_results_*/` and for CIBERSORTx tables in `cell_composition/cell_composition_analysis/` (`--parent-dir` and `--cell-dir` override those locations).
 
 ## Learning curves
 
